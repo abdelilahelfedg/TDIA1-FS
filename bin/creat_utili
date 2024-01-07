@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import os
+import json
+from passlib.hash import sha256_crypt
+import click
+
+# Emplacement fixe du fichier utilisateurs
+EMPLACEMENT_FICHIER_UTILISATEURS = os.path.join('/', 'home', 'abdelilah', 'idfs', 'fich_config', 'utilisateurs.json')
+
+def est_utilisateur_connecte(utilisateur):
+    return utilisateur.get('connecte', False)
+
+@click.command()
+@click.option('--repertoire-personnel', default='/home/abdelilah/idfs/user', help='Chemin vers le répertoire personnel')
+@click.option('--nom-utilisateur', prompt='Nom d\'utilisateur', help='Nom de l\'utilisateur à créer')
+def creer_utilisateur(repertoire_personnel, nom_utilisateur):
+    """Crée un utilisateur avec un mot de passe haché, et ajoute ces informations au fichier utilisateurs au format JSON."""
+
+    try:
+        # Vérifie si le fichier utilisateurs existe, sinon le crée
+        try:
+            with open(EMPLACEMENT_FICHIER_UTILISATEURS, 'r') as f:
+                utilisateurs = json.load(f)
+        except FileNotFoundError:
+            with open(EMPLACEMENT_FICHIER_UTILISATEURS, 'w') as f:
+                json.dump({}, f)
+            utilisateurs = {}
+
+        # Vérifie si le nom d'utilisateur existe déjà
+        if nom_utilisateur in utilisateurs:
+            click.echo(f"L'utilisateur {nom_utilisateur} existe déjà.")
+            return
+
+        # Demande le mot de passe de l'utilisateur
+        mot_de_passe = click.prompt("Entrez le mot de passe : ", hide_input=True, confirmation_prompt=True)
+
+        # Hache le mot de passe avec Passlib
+        mot_de_passe_hache = sha256_crypt.hash(mot_de_passe)
+        # Crée le répertoire personnel de l'utilisateur
+        chemin_repertoire = os.path.join(repertoire_personnel, nom_utilisateur)
+
+        os.makedirs(chemin_repertoire, exist_ok=True)
+        # Ajoute les informations de l'utilisateur au fichier utilisateurs au format JSON
+        utilisateurs[nom_utilisateur] = {'mot_de_passe': mot_de_passe_hache, 'repertoire': chemin_repertoire, 'connecte': False}
+        with open(EMPLACEMENT_FICHIER_UTILISATEURS, 'w') as f_utilisateurs:
+            json.dump(utilisateurs, f_utilisateurs, indent=2)
+        click.echo(f"Utilisateur {nom_utilisateur} créé avec succès.")
+
+    except Exception as e:
+        click.echo(f'Erreur lors de la création de l\'utilisateur : {e}')
+
+if __name__ == '__main__':
+    creer_utilisateur()
+

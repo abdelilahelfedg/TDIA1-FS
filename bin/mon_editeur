@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import click
+import subprocess
+
+@click.command()
+@click.argument('fichier', type=click.Path())
+def editer_avec_nano(fichier):
+    """Commande pour éditer un fichier avec l'éditeur de texte nano."""
+    try:
+        # Utilise la commande subprocess pour appeler "nano" avec le fichier spécifié
+        subprocess.run(["/usr/bin/nano", fichier])
+    except subprocess.CalledProcessError as e:
+        # En cas d'erreur, affiche un message d'erreur
+        click.echo(f"Erreur lors de l'édition du fichier avec nano : {e}")
+
+# Appelle la fonction editer_avec_nano directement après sa définition
+
+if __name__ == '__main__':
+    editer_avec_nano()

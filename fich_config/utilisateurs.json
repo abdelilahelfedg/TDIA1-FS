@@ -1,0 +1,37 @@
+{
+  "Etudiant1": {
+    "mot_de_passe": "$5$rounds=535000$LPJGpyFdTxzwzaO2$UfL.0A1K.00R7VTj9UJNCVXHTcuGRmGwk5HbrENenU.",
+    "repertoire": "/home/abdelilah/idfs/user/Etudiant1",
+    "connecte": false
+  },
+  "Etudiant2": {
+    "mot_de_passe": "$5$rounds=535000$FDseCYc0235YCHFA$KHF8W3eoPsvFrjxQn3tFuiLW1l7XrkwYjnj/0.zoRL.",
+    "repertoire": "/home/abdelilah/idfs/user/Etudiant2",
+    "connecte": false
+  },
+  "Etudiant3": {
+    "mot_de_passe": "$5$rounds=535000$p0FFEZ3ONGSQYr.8$sUHe2UGEYE3MGx51hBhB/pIy7ih32IoRKo0cMlz8ro5",
+    "repertoire": "/home/abdelilah/idfs/user/Etudiant3",
+    "connecte": false
+  },
+  "Etudiant4": {
+    "mot_de_passe": "$5$rounds=535000$k7BtKOi8O1yH.YMf$ICe9UiIb0d9Gd43oGbkVwAJ9XhJhNTiXbC1IetoW5D0",
+    "repertoire": "/home/abdelilah/idfs/user/Etudiant4",
+    "connecte": false
+  },
+  "Etudiant5": {
+    "mot_de_passe": "$5$rounds=535000$G7/ZS42ADnqJhJxh$qhMLnIh11nShd.O1UMVDisC9s97KQuDz1U6.3Hwtzv0",
+    "repertoire": "/home/abdelilah/idfs/user/Etudiant5",
+    "connecte": false
+  },
+  "Prof1": {
+    "mot_de_passe": "$5$rounds=535000$0k8Cc3qtultSK8xH$NwumvMwt/hrIDhwUy4ZAc.AKHoqr542OtCypxI/2Vo6",
+    "repertoire": "/home/abdelilah/idfs/user/Prof1",
+    "connecte": false
+  },
+  "Prof2": {
+    "mot_de_passe": "$5$rounds=535000$Rt0R3BBaOsJtFrnE$FJwkSezoPb.mr1hrISfUNcwkvHrY9FOhe8s98CC9e46",
+    "repertoire": "/home/abdelilah/idfs/user/Prof2",
+    "connecte": false
+  }
+}

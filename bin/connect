@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+import json
+import os
+import click
+from passlib.hash import sha256_crypt
+from datetime import datetime
+
+FICHIER_JOURNAL_CONNEXIONS = '/home/abdelilah/idfs/fich_config/logging.log'
+
+def charger_utilisateurs():
+    try:
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'r') as fichier:
+            utilisateurs = json.load(fichier)
+    except FileNotFoundError:
+        utilisateurs = {}
+    return utilisateurs
+
+def est_utilisateur_connecte(utilisateurs, nom_utilisateur):
+    return utilisateurs.get(nom_utilisateur, {}).get('connecte', False)
+
+def verifier_mot_de_passe(hache_stocke, mot_de_passe):
+    return sha256_crypt.verify(mot_de_passe, hache_stocke)
+
+def connecter_utilisateur(utilisateurs, nom_utilisateur, mot_de_passe):
+    utilisateur_actuel = [nom for nom, info in utilisateurs.items() if info.get('connecte', False)]
+
+    if utilisateur_actuel:
+        click.echo(f"Désolé, mais l'utilisateur {utilisateur_actuel[0]} est déjà connecté. Une seule connexion est autorisée à la fois.")
+    elif nom_utilisateur in utilisateurs and verifier_mot_de_passe(utilisateurs[nom_utilisateur]['mot_de_passe'], mot_de_passe):
+        utilisateurs[nom_utilisateur]['connecte'] = True
+        repertoire_personnel = os.path.join('/home/abdelilah/idfs/user', nom_utilisateur)
+        os.chdir(repertoire_personnel)
+        click.echo(f"L'utilisateur {nom_utilisateur} est maintenant connecté.")
+
+        # Journaliser la connexion de l'utilisateur
+        journaliser_connexion(nom_utilisateur)
+
+        # Enregistre les modifications dans le fichier utilisateurs.json
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'w') as fichier:
+            json.dump(utilisateurs, fichier, indent=2)
+    elif nom_utilisateur in utilisateurs:
+        click.echo("Mot de passe incorrect.")
+    else:
+        click.echo("Nom d'utilisateur incorrect.")
+
+def journaliser_connexion(nom_utilisateur):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(FICHIER_JOURNAL_CONNEXIONS, 'a') as fichier_journal_connexions:
+        fichier_journal_connexions.write(f"{timestamp} - Connexion - {nom_utilisateur}\n")
+
+@click.command()
+@click.option('--nom-utilisateur', prompt='Nom d\'utilisateur', help='Nom d\'utilisateur')
+@click.option('--mot-de-passe', prompt='Mot de passe', hide_input=True, help='Mot de passe')
+def main(nom_utilisateur, mot_de_passe):
+    utilisateurs = charger_utilisateurs()
+    connecter_utilisateur(utilisateurs, nom_utilisateur, mot_de_passe)
+
+if __name__ == '__main__':
+    main()

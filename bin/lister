@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import os
+import click
+import json
+
+@click.command()
+@click.argument('repertoire', default='.', type=click.Path(exists=True))
+def lister_fichiers(repertoire):
+    """Commande pour lister les fichiers et répertoires dans un répertoire."""
+    try:
+        # Obtient le nom de l'utilisateur connecté à partir du fichier utilisateurs.json
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'r') as fichier:
+            utilisateurs = json.load(fichier)
+
+        utilisateur_connecte = next((nom_utilisateur for nom_utilisateur, info_utilisateur in utilisateurs.items() if info_utilisateur.get('connecte', False)), None)
+
+        # Vérifie que l'utilisateur ne commence pas par 'E'
+        if not utilisateur_connecte or not utilisateur_connecte.startswith('E'):
+            click.echo("Erreur : Vous n'avez pas le droit de lister les fichiers.")
+            return
+
+        # Vérifie que le répertoire actuel est le répertoire personnel de l'utilisateur
+        repertoire_utilisateur = utilisateurs[utilisateur_connecte].get('repertoire', '')
+
+        if not os.path.samefile(repertoire, repertoire_utilisateur):
+            click.echo("Erreur : Vous n'avez pas le droit de lister ce répertoire.")
+            return
+
+        # Liste les fichiers et répertoires dans le répertoire spécifié
+        fichiers = [fichier for fichier in os.listdir(repertoire) if not fichier.startswith('.')]
+        
+        # Affiche chaque fichier ou répertoire
+        for fichier in fichiers:
+            click.echo(fichier)
+
+    except Exception as e:
+        # En cas d'erreur, affiche un message d'erreur
+        click.echo(f'Erreur lors de la liste des fichiers : {e}')
+
+# Appelle la fonction lister_fichiers directement après sa définition
+if __name__ == '__main__':
+    lister_fichiers()
+

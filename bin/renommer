@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+import click
+import os
+from datetime import datetime
+
+FICHIER_JOURNAL = '/home/abdelilah/idfs/fich_config/journal.log'
+
+@click.command()
+@click.argument('ancien_nom', metavar='ancien_nom')
+@click.argument('nouveau_nom', metavar='nouveau_nom')
+def renommer_element(ancien_nom, nouveau_nom):
+    try:
+        # Vérifie si l'ancien nom existe
+        if not os.path.exists(ancien_nom):
+            click.echo(f'Erreur : {ancien_nom} n\'existe pas.')
+            return
+
+        # Vérifie si le nouveau nom existe déjà
+        if os.path.exists(nouveau_nom):
+            click.echo(f'Erreur : {nouveau_nom} existe déjà.')
+            return
+
+        # Renomme le fichier ou le dossier
+        os.rename(ancien_nom, nouveau_nom)
+        click.echo(f'Élément renommé avec succès. Nouveau nom : {nouveau_nom}')
+
+        # Journaliser l'opération de renommage
+        journaliser_operation("RENAME", ancien_nom, nouveau_nom)
+
+    except Exception as e:
+        # En cas d'erreur, affiche un message d'erreur
+        click.echo(f'Erreur lors du renommage de l\'élément : {e}')
+
+def journaliser_operation(operation, ancien_nom, nouveau_nom):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(FICHIER_JOURNAL, 'a') as fichier_journal:
+        fichier_journal.write(f"{timestamp} - {operation} - {ancien_nom} -> {nouveau_nom}\n")
+
+if __name__ == '__main__':
+    renommer_element()

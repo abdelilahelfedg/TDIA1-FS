@@ -1,0 +1,11 @@
+2023-12-28 06:33:55 - {'mot_de_passe': '$5$rounds=535000$0k8Cc3qtultSK8xH$NwumvMwt/hrIDhwUy4ZAc.AKHoqr542OtCypxI/2Vo6', 'repertoire': '/home/abdelilah/idfs/user/Prof1', 'connecte': True} - CREATE - cour1
+2023-12-28 06:41:22 - {'mot_de_passe': '$5$rounds=535000$0k8Cc3qtultSK8xH$NwumvMwt/hrIDhwUy4ZAc.AKHoqr542OtCypxI/2Vo6', 'repertoire': '/home/abdelilah/idfs/user/Prof1', 'connecte': True} - CREATE - chapitre1
+2023-12-28 06:54:59 - RENAME - connecte -> connect
+2023-12-28 06:55:23 - RENAME - creat_directe -> creat_direct
+2023-12-28 06:55:41 - RENAME - creat_fiche -> creat_fich
+2023-12-28 06:56:14 - RENAME - deconnexione -> deconnexion
+2023-12-28 06:56:55 - RENAME - renommere -> renommer
+2023-12-28 07:36:55 - DELETE - supp
+2024-01-01 12:42:02 - RENAME - suppe -> supprimer
+2024-01-01 12:45:29 - RENAME - TD -> td
+2024-01-01 12:45:40 - RENAME - td -> TD

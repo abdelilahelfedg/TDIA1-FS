@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+import click
+import os
+import json
+from click import echo  # Importez explicitement la fonction echo
+from datetime import datetime
+
+FICHIER_JOURNAL = '/home/abdelilah/idfs/fich_config/journal.log'
+
+def est_utilisateur_connecte(utilisateur):
+    return utilisateur.get('connecte', False)
+
+def obtenir_repertoire_utilisateur(utilisateur):
+    return utilisateur.get('repertoire', '')
+
+def verifier_utilisateur_et_repertoire(utilisateurs, nom_repertoire):
+    utilisateur_connecte = next((nom_utilisateur for nom_utilisateur, info_utilisateur in utilisateurs.items() if est_utilisateur_connecte(info_utilisateur)), None)
+
+    if utilisateur_connecte:
+        if utilisateur_connecte.startswith('E'):
+            repertoire_actuel = os.getcwd()
+            repertoire_utilisateur = obtenir_repertoire_utilisateur(utilisateurs[utilisateur_connecte])
+
+            if repertoire_actuel == repertoire_utilisateur:
+                return True
+            else:
+                echo(f"Erreur : Vous devez être dans votre répertoire personnel ({repertoire_utilisateur}) pour créer un dossier.")
+        elif utilisateur_connecte.startswith('P'):
+            repertoire_actuel = os.getcwd()
+            if repertoire_actuel not in ['/home/abdelilah/idfs/bin', '/home/abdelilah/idfs/fich_config']:
+                return True
+            else:
+                echo(f"Erreur : Vous ne pouvez pas créer un dossier dans le répertoire actuel ({repertoire_actuel}).")
+        else:
+            echo(f"Erreur : L'utilisateur {utilisateur_connecte} n'est pas autorisé à créer un dossier.")
+    else:
+        echo("Erreur : Aucun utilisateur connecté.")
+
+    return False
+
+def journaliser_operation(utilisateur, operation, repertoire):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(FICHIER_JOURNAL, 'a') as fichier_journal:
+        fichier_journal.write(f"{timestamp} - {utilisateur} - {operation} - {repertoire}\n")
+
+@click.command()
+@click.argument('noms_repertoires', nargs=-1)
+def creer_repertoires(noms_repertoires):
+    """Commande pour créer un ou plusieurs répertoires."""
+    try:
+        # Charge les utilisateurs depuis le fichier JSON
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'r') as fichier:
+            utilisateurs = json.load(fichier)
+
+        # Obtient l'utilisateur actuellement connecté (supposé unique)
+        utilisateur_connecte = next((utilisateur for utilisateur in utilisateurs.values() if est_utilisateur_connecte(utilisateur)), None)
+
+        if utilisateur_connecte:
+            for nom_repertoire in noms_repertoires:
+                if verifier_utilisateur_et_repertoire(utilisateurs, nom_repertoire):
+                    if os.path.exists(nom_repertoire):
+                        echo(f'Erreur : Le répertoire {nom_repertoire} existe déjà.')
+                    else:
+                        os.makedirs(nom_repertoire)
+                        echo(f'Répertoire {nom_repertoire} créé avec succès.')
+                        # Journaliser l'opération de création de répertoire
+                        journaliser_operation(utilisateur_connecte, "CREATE", nom_repertoire)
+        else:
+            echo("Erreur : Aucun utilisateur connecté.")
+
+    except Exception as e:
+        echo(f'Erreur lors de la création des répertoires : {e}')
+
+if __name__ == '__main__':
+    creer_repertoires()

@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+import click
+import os
+from datetime import datetime
+
+FICHIER_JOURNAL = '/home/abdelilah/idfs/fich_config/journal.log'
+
+@click.command()
+@click.argument('noms_elements', nargs=-1)
+@click.option('--dossier', '-d', is_flag=True, help='Supprimer des dossiers au lieu de fichiers.')
+def supprimer_elements(noms_elements, dossier):
+    try:
+        for nom_element in noms_elements:
+            # Vérifie si le fichier ou dossier existe
+            if not os.path.exists(nom_element):
+                click.echo(f'Erreur : {nom_element} n\'existe pas.')
+                continue
+
+            # Journalise l'opération de suppression avant de la réaliser
+            journaliser_operation("DELETE", nom_element)
+
+            # Supprime le fichier ou le dossier
+            if dossier:
+                os.rmdir(nom_element)  # Supprime le dossier
+                click.echo(f'Dossier {nom_element} supprimé avec succès.')
+            else:
+                os.remove(nom_element)  # Supprime le fichier
+                click.echo(f'Fichier {nom_element} supprimé avec succès.')
+    except Exception as e:
+        # En cas d'erreur, affiche un message d'erreur
+        click.echo(f'Erreur lors de la suppression des éléments : {e}')
+
+def journaliser_operation(operation, element):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(FICHIER_JOURNAL, 'a') as fichier_journal:
+        fichier_journal.write(f"{timestamp} - {operation} - {element}\n")
+
+if __name__ == '__main__':
+    supprimer_elements()

@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+import json
+import click
+from datetime import datetime
+
+FICHIER_JOURNAL_CONNEXIONS = '/home/abdelilah/idfs/fich_config/logging.log'
+
+def charger_utilisateurs():
+    try:
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'r') as fichier:
+            utilisateurs = json.load(fichier)
+    except FileNotFoundError:
+        utilisateurs = {}
+    return utilisateurs
+
+def est_utilisateur_connecte(utilisateurs, nom_utilisateur):
+    return utilisateurs.get(nom_utilisateur, {}).get('connecte', False)
+
+def deconnecter_utilisateur(utilisateurs, nom_utilisateur):
+    if est_utilisateur_connecte(utilisateurs, nom_utilisateur):
+        utilisateurs[nom_utilisateur]['connecte'] = False
+        click.echo(f"L'utilisateur {nom_utilisateur} a été déconnecté.")
+
+        # Journaliser la déconnexion de l'utilisateur
+        journaliser_deconnexion(nom_utilisateur)
+
+        with open('/home/abdelilah/idfs/fich_config/utilisateurs.json', 'w') as fichier:
+            json.dump(utilisateurs, fichier, indent=2)
+    else:
+        click.echo(f"L'utilisateur {nom_utilisateur} n'est pas actuellement connecté.")
+
+def journaliser_deconnexion(nom_utilisateur):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(FICHIER_JOURNAL_CONNEXIONS, 'a') as fichier_journal_connexions:
+        fichier_journal_connexions.write(f"{timestamp} - Déconnexion - {nom_utilisateur}\n")
+
+@click.command()
+@click.option('--nom-utilisateur', prompt='Nom d\'utilisateur', help='Nom d\'utilisateur')
+def main(nom_utilisateur):
+    utilisateurs = charger_utilisateurs()
+    deconnecter_utilisateur(utilisateurs, nom_utilisateur)
+
+if __name__ == '__main__':
+    main()
